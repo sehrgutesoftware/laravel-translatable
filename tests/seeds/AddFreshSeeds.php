@@ -2,10 +2,8 @@
 
 use Dimsav\Translatable\Test\Model\City;
 use Dimsav\Translatable\Test\Model\Country;
-use Dimsav\Translatable\Test\Model\Vegetable;
 use Dimsav\Translatable\Test\Model\CityTranslation;
 use Dimsav\Translatable\Test\Model\CountryTranslation;
-use Dimsav\Translatable\Test\Model\VegetableTranslation;
 
 class AddFreshSeeds
 {
@@ -44,25 +42,6 @@ class AddFreshSeeds
         ];
 
         $this->createCityTranslations($cityTranslations);
-
-        $vegetables = [
-            ['vegetable_identity' => 1],
-            ['vegetable_identity' => 2],
-        ];
-
-        $this->createVegetables($vegetables);
-
-        $vegetableTranslations = [
-            ['vegetable_identity' => 1, 'locale' => 'en',    'name' => 'zucchini'],
-            ['vegetable_identity' => 1, 'locale' => 'en-GB', 'name' => 'courgette'],
-            ['vegetable_identity' => 1, 'locale' => 'en-US', 'name' => 'zucchini'],
-            ['vegetable_identity' => 1, 'locale' => 'de',    'name' => 'Zucchini'],
-            ['vegetable_identity' => 1, 'locale' => 'de-CH', 'name' => 'Zucchetti'],
-            ['vegetable_identity' => 2, 'locale' => 'en',    'name' => 'aubergine'],
-            ['vegetable_identity' => 2, 'locale' => 'en-US', 'name' => 'eggplant'],
-        ];
-
-        $this->createVegetableTranslations($vegetableTranslations);
     }
 
     private function createCountries($countries)
@@ -101,26 +80,6 @@ class AddFreshSeeds
         foreach ($translations as $data) {
             $translation = new CityTranslation();
             $translation->city_id = $data['city_id'];
-            $translation->locale = $data['locale'];
-            $translation->name = $data['name'];
-            $translation->save();
-        }
-    }
-
-    private function createVegetables($vegetables)
-    {
-        foreach ($vegetables as $vegetable) {
-            $vegetable = new Vegetable();
-            $vegetable->identity = $vegetable['identity'];
-            $vegetable->save();
-        }
-    }
-
-    private function createVegetableTranslations($translations)
-    {
-        foreach ($translations as $data) {
-            $translation = new VegetableTranslation();
-            $translation->vegetable_identity = $data['vegetable_identity'];
             $translation->locale = $data['locale'];
             $translation->name = $data['name'];
             $translation->save();

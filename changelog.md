@@ -1,20 +1,5 @@
 ## Version History
 
-### v. 9.0
-
-- Added support for Laravel 5.6 #435
-
-### v. 8.1
-
-- Fixed error when fallback not available. #422
-- Fixed withTranslation query scope performance #417
-- Fixed fallback for country-based locales #417
-- Fixed empty attribute values #410
-
-### v. 8.0
-
-- Added support for Laravel 5.5 #394
-
 ### v. 7.3
 
 - Added compatibility with custom db connections. #366

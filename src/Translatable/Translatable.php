@@ -2,6 +2,7 @@
 
 namespace Dimsav\Translatable;
 
+use App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -108,7 +109,9 @@ trait Translatable
      */
     public function getTranslationModelNameDefault()
     {
-        return get_class($this).config('translatable.translation_suffix', 'Translation');
+        $config = app()->make('config');
+
+        return get_class($this).$config->get('translatable.translation_suffix', 'Translation');
     }
 
     /**
@@ -132,7 +135,9 @@ trait Translatable
      */
     public function getLocaleKey()
     {
-        return $this->localeKey ?: config('translatable.locale_key', 'locale');
+        $config = app()->make('config');
+
+        return $this->localeKey ?: $config->get('translatable.locale_key', 'locale');
     }
 
     /**
@@ -148,7 +153,7 @@ trait Translatable
      */
     private function usePropertyFallback()
     {
-        return config('translatable.use_property_fallback', false);
+        return app()->make('config')->get('translatable.use_property_fallback', false);
     }
 
     /**
@@ -164,11 +169,7 @@ trait Translatable
         $value = $this->getTranslation($locale)->$attribute;
 
         $usePropertyFallback = $this->useFallback() && $this->usePropertyFallback();
-        if (
-            empty($value) &&
-            $usePropertyFallback &&
-            ($fallback = $this->getTranslation($this->getFallbackLocale(), true))
-        ) {
+        if (empty($value) && $usePropertyFallback && $fallback = $this->getTranslation($this->getFallbackLocale(), true)) {
             return $fallback->$attribute;
         }
 
@@ -186,7 +187,7 @@ trait Translatable
 
         if ($this->isTranslationAttribute($attribute)) {
             if ($this->getTranslation($locale) === null) {
-                return $this->getAttributeValue($attribute);
+                return null;
             }
 
             // If the given $attribute has a mutator, we push it to $attributes and then call getAttributeValue
@@ -322,7 +323,7 @@ trait Translatable
             }
         }
 
-        return config('translatable.fallback_locale');
+        return app()->make('config')->get('translatable.fallback_locale');
     }
 
     /**
@@ -356,7 +357,7 @@ trait Translatable
             return $this->useTranslationFallback;
         }
 
-        return config('translatable.use_fallback');
+        return app()->make('config')->get('translatable.use_fallback');
     }
 
     /**
@@ -388,7 +389,7 @@ trait Translatable
      */
     protected function getLocales()
     {
-        $localesConfig = (array) config('translatable.locales');
+        $localesConfig = (array) app()->make('config')->get('translatable.locales');
 
         if (empty($localesConfig)) {
             throw new LocalesNotDefinedException('Please make sure you have run "php artisan config:publish dimsav/laravel-translatable" '.
@@ -415,7 +416,7 @@ trait Translatable
      */
     protected function getLocaleSeparator()
     {
-        return config('translatable.locale_separator', '-');
+        return app()->make('config')->get('translatable.locale_separator', '-');
     }
 
     /**
@@ -581,15 +582,11 @@ trait Translatable
     {
         $query->with([
             'translations' => function (Relation $query) {
+                $query->where($this->getTranslationsTable().'.'.$this->getLocaleKey(), $this->locale());
+
                 if ($this->useFallback()) {
-                    $locale = $this->locale();
-                    $countryFallbackLocale = $this->getFallbackLocale($locale); // e.g. de-DE => de
-                    $locales = array_unique([$locale, $countryFallbackLocale, $this->getFallbackLocale()]);
-
-                    return $query->whereIn($this->getTranslationsTable().'.'.$this->getLocaleKey(), $locales);
+                    return $query->orWhere($this->getTranslationsTable().'.'.$this->getLocaleKey(), $this->getFallbackLocale());
                 }
-
-                return $query->where($this->getTranslationsTable().'.'.$this->getLocaleKey(), $this->locale());
             },
         ]);
     }
@@ -733,7 +730,7 @@ trait Translatable
             return $this->defaultLocale;
         }
 
-        return config('translatable.locale')
+        return app()->make('config')->get('translatable.locale')
             ?: app()->make('translator')->getLocale();
     }
 
@@ -803,6 +800,6 @@ trait Translatable
      */
     private function toArrayAlwaysLoadsTranslations()
     {
-        return config('translatable.to_array_always_loads_translations', true);
+        return app()->make('config')->get('translatable.to_array_always_loads_translations', true);
     }
 }

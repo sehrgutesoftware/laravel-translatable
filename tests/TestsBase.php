@@ -123,8 +123,7 @@ class TestsBase extends TestCase
             'collation' => 'utf8_unicode_ci',
             'strict' => false,
         ]);
-        $locales = ['el', 'en', 'fr', 'de', 'id', 'en-GB', 'en-US', 'de-DE', 'de-CH'];
-        $app['config']->set('translatable.locales', $locales);
+        $app['config']->set('translatable.locales', ['el', 'en', 'fr', 'de', 'id']);
     }
 
     protected function getPackageAliases($app)
@@ -135,9 +134,13 @@ class TestsBase extends TestCase
     protected function enableQueryCounter()
     {
         $that = $this;
-        DB::listen(function ($query) use ($that) {
+        $event = App::make('events');
+        $event->listen('illuminate.query', function ($query, $bindings) use ($that) {
             $that->queriesCount++;
-            // echo("\n--- Query {$that->queriesCount}--- $query->sql\n");
+            $bindings = $this->formatBindingsForSqlInjection($bindings);
+            $query = $this->insertBindingsIntoQuery($query, $bindings);
+            $query = $this->beautifyQuery($query);
+            // echo("\n--- Query {$that->queriesCount}--- $query\n");
         });
     }
 

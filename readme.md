@@ -3,7 +3,7 @@ Laravel-Translatable
 
 
 [![Total Downloads](https://poser.pugx.org/dimsav/laravel-translatable/downloads.svg)](https://packagist.org/packages/dimsav/laravel-translatable)
-[![Build Status](https://circleci.com/gh/dimsav/laravel-translatable.png?style=shield)](https://circleci.com/gh/dimsav/laravel-translatable)
+[![Build Status](https://travis-ci.org/dimsav/laravel-translatable.svg?branch=v4.3)](https://travis-ci.org/dimsav/laravel-translatable)
 [![Code Coverage](https://scrutinizer-ci.com/g/dimsav/laravel-translatable/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/dimsav/laravel-translatable/?branch=master)
 [![Latest Stable Version](http://img.shields.io/packagist/v/dimsav/laravel-translatable.svg)](https://packagist.org/packages/dimsav/laravel-translatable)
 [![License](https://poser.pugx.org/dimsav/laravel-translatable/license.svg)](https://packagist.org/packages/dimsav/laravel-translatable)
@@ -25,7 +25,6 @@ This is a Laravel package for translatable models. Its goal is to remove the com
 * [Configuration](#configuration)
 * [Features list](#features-list)
 * [FAQ / Support](#faq)
-* [Donations](#donations)
 
 ## Demo
 
@@ -73,8 +72,6 @@ This is a Laravel package for translatable models. Its goal is to remove the com
 
  Laravel  | Translatable
 :---------|:----------
- 5.6      | 9.*
- 5.5      | 8.*
  5.4      | 7.*
  5.3      | 6.*
  5.2      | 5.5 - 6.*
@@ -482,29 +479,11 @@ Got any question or suggestion? Feel free to open an [Issue](https://github.com/
 
 #### I want to help!
 
-You are awesome! Watch the repo and reply to the issues. You will help offering a great experience to the users of the package. `#communityWorks`
-
-Also buy me a beer by making a [donation](#donations). ❤️
+You are awesome! Watched the repo and reply to the issues. You will help offering a great experience to the users of the package. `#communityWorks`
 
 #### I am getting collisions with other trait methods!
 
 Translatable is fully compatible with all kinds of Eloquent extensions, including Ardent. If you need help to implement Translatable with these extensions, see this [example](https://gist.github.com/dimsav/9659552).
-
-#### How do I migrate my existing table to use laravel-translatable?
-
-Please see the installation steps to understand how your database should be structured.
-
-If your properties are written in english, we recommend using these commands in your migrations:
-
-```php
-// We insert the translation attributes into the fresh translated table: 
-\DB::statement("insert into country_translations (country_id, name, locale) select id, name, 'en' from countries");
-
-// We drop the translation attributes in our main table: 
-Schema::table('countries', function ($table) {
-    $table->dropColumn('name');
-}); 
-```
 
 #### How do I sort by translations?
 
@@ -523,10 +502,8 @@ ORDER BY t.name desc
 The corresponding eloquent query would be:
 
 ```php
-Country::join('country_translations as t', function ($join) {
-        $join->on('countries.id', '=', 't.country_id')
-            ->where('t.locale', '=', 'en');
-    }) 
+Country::join('country_translations as t', 't.country_id', '=', 'countries.id')
+    ->where('locale', 'en')
     ->groupBy('countries.id')
     ->orderBy('t.name', 'desc')
     ->with('translations')
@@ -587,13 +564,3 @@ Schema::create('language_translations', function(Blueprint $table){
 ```
 
 The best solution though would be to update your mysql version. And **always make sure you have the same version both in development and production environment!**
-
-## Donations
-
-This software has been crafted with attention and love.
-
-Show your love and support by sending bitcoin to this address: `167QC4XQ3acgbwVYWAdmS81jARCcVTWBXU`
-
-Or by sending to this PayPal address: `ds@dimsav.com`
-
-❤️ Thank you!
